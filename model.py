@@ -436,10 +436,15 @@ class State():
         # The 'forward' direction is dependent on which player's pawn it is)
         forward_delta = 1 if player == Players.WHITE else -1
 
-        if rank_diff == forward_delta and file_diff == 0:
+        forward1_path_idx = 8 * (pos[0]+forward_delta) + pos[1]
+        forward1_path = int(self.state[forward1_path_idx], 16)
+        forward2_path_idx = 8 * (pos[0]+2*forward_delta) + pos[1]
+        forward2_path = int(self.state[forward2_path_idx], 16)
+
+        if rank_diff == forward_delta and file_diff == 0 and forward1_path == 0:
             # A normal pawn move, forward one square
             correct_move_shape = True
-        elif rank_diff == 2 * forward_delta and file_diff == 0:
+        elif rank_diff == 2 * forward_delta and file_diff == 0 and forward1_path == 0 and forward2_path == 0:
             # If a pawn is on its starting rank it can move forward two squares 
             correct_move_shape = pos[0] == player.value + forward_delta
         elif rank_diff == forward_delta and abs(file_diff) == 1:
