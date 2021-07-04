@@ -441,10 +441,10 @@ class State():
         forward2_path_idx = 8 * (pos[0]+2*forward_delta) + pos[1]
         forward2_path = int(self.state[forward2_path_idx], 16)
 
-        if rank_diff == forward_delta and file_diff == 0 and forward1_path == 0:
+        if rank_diff == forward_delta and file_diff == 0 and forward1_path == Pieces.E.value:
             # A normal pawn move, forward one square
             correct_move_shape = True
-        elif rank_diff == 2 * forward_delta and file_diff == 0 and forward1_path == 0 and forward2_path == 0:
+        elif rank_diff == 2 * forward_delta and file_diff == 0 and forward1_path == 0 and forward2_path == Pieces.E.value:
             # If a pawn is on its starting rank it can move forward two squares 
             correct_move_shape = pos[0] == player.value + forward_delta
         elif rank_diff == forward_delta and abs(file_diff) == 1:
