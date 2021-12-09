@@ -1,8 +1,10 @@
+from typing import Tuple
 import pygame
 pygame.init()
 
 import os
-from model import *
+from .model.board import Board
+from .model.pos import Pos
 from enum import Enum
 
 class Colors(Enum):
@@ -71,11 +73,11 @@ class PieceGroup(pygame.sprite.Group):
         self.lostsprites = []
 
 class TileEffectView(pygame.sprite.Sprite):
-    def __init__(self, idx, pos, size):
+    def __init__(self, board_pos: Pos, screen_pos: Tuple[int, int], size: int):
         pygame.sprite.Sprite.__init__(self)
 
-        self.idx = idx
-        self.pos = pos
+        self.board_pos = board_pos
+        self.screen_pos = screen_pos
         self.size = size
 
         self.image = pygame.Surface((size, size))
@@ -84,37 +86,36 @@ class TileEffectView(pygame.sprite.Sprite):
         self.image.set_alpha(50)
 
         self.rect = self.image.get_rect()
-        self.rect.x = self.pos[0]
-        self.rect.y = self.pos[1]
+        self.rect.x = self.screen_pos[0]
+        self.rect.y = self.screen_pos[1]
 
         self.background = pygame.Surface((size, size))
         self.background.fill(Colors.LIGHT_BLUE.value)
         self.background.set_alpha(0)
 
         self.background_rect = self.background.get_rect()
-        self.background_rect.x = self.pos[0]
-        self.background_rect.y = self.pos[1]
+        self.background_rect.x = self.screen_pos[0]
+        self.background_rect.y = self.screen_pos[1]
     
     def update(self, pos, legal_moves, legal_captures, last_move):
         self.image.fill(Colors.PURPLE.value)
 
         origin, dest = last_move
-        if self.idx == origin or self.idx == dest:
+        if self.board_pos == origin or self.board_pos == dest:
             self.background.set_alpha(128)
         else:
             self.background.set_alpha(0)
-
-
-        if self.idx in legal_captures:
+        
+        if self.board_pos in legal_captures:
             pygame.draw.circle(self.image, Colors.BLACK.value, \
                 (self.size//2, self.size//2), self.size//2, width=self.size//10)
 
-        if self.idx in legal_moves:
+        if self.board_pos in legal_moves:
             pygame.draw.circle(self.image, Colors.BLACK.value, \
                 (self.size//2, self.size//2), self.size//6, width=0)
 
         if self.rect.collidepoint(pos):
-            color = Colors.CREAM.value if self.idx[0] % 2 == self.idx[1] % 2 else Colors.BLUE.value
+            color = Colors.CREAM.value if self.board_pos[0] % 2 == self.board_pos[1] % 2 else Colors.BLUE.value
             pygame.draw.rect(self.image, color, [0, 0, self.size, self.size], self.size//10)
 
 class TileGroup(pygame.sprite.Group):
@@ -129,23 +130,23 @@ class TileGroup(pygame.sprite.Group):
 
        
 class StateView():
-    def __init__(self, directory, size=(800,800), pos=(0,0), state=None):
+    def __init__(self, directory, size=(800,800), pos=(0,0), board=None):
         """
         param directory:
             path to the directory containing the piece sprites
         param size:
             the size of the board
-        param state:
+        param board:
             the state of the game
         """
         self.size = size
         self.pos = pos
         self.directory = directory
 
-        if state is None:
-            self.state = State(State.STARTING_STATE)
+        if board is None:
+            self.board = Board()
         else: 
-            self.state = state
+            self.board = board
 
         self.sprites = pygame.sprite.Group()
         self.tiles = TileGroup()
@@ -159,21 +160,20 @@ class StateView():
         for i in range(8):
             for j in range(8):
                 tile_effect_view = \
-                    TileEffectView((i, j), (j*tile_size+self.pos[0], (7-i)*tile_size+self.pos[1]), tile_size)
+                    TileEffectView(Pos(i, j), (j*tile_size+self.pos[0], (7-i)*tile_size+self.pos[1]), tile_size)
                 tile_effect_view.add(self.tiles, self.sprites)
 
     def convert_model_to_view(self):
         tile_size = int(self.size[0] / 8)
         for i in range(8):
             for j in range(8):
-                idx = 8 * i + j
-                el = int(self.state.state[idx], 16)
-                if el != Pieces.E.value:
-                    player = Players.BLACK if el > Players.BLACK.value else Players.WHITE
+                pos = Pos(i, j)
+                p = self.board.get(pos)
+                if p is not None:
                     piece = PieceView(
                         self.directory,
-                        Pieces(el - player.value), 
-                        player,
+                        p, 
+                        p.player,
                         (i, j),
                         (j*tile_size+self.pos[0], (7-i)*tile_size+self.pos[1]), 
                         tile_size)
@@ -182,7 +182,7 @@ class StateView():
     def update(self, state):
         """
         """
-        self.state = state
+        self.board = state
         for piece in self.pieces:
             piece.kill()
         self.convert_model_to_view()
