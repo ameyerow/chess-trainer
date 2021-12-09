@@ -2,8 +2,6 @@ import re
 import itertools
 from enum import Enum
 
-from pygame.event import clear
-
 class Players(Enum):
     WHITE = 0
     BLACK = 7
@@ -114,11 +112,11 @@ class State():
     def is_under_attack(self, pos):
         """
         param pos: 
-            the (rank, file) position of the piece being moved
+            a (rank, file) position
         return:
             whether or not the pos is under attack by another piece
         """
-
+        
         pass
 
     def legal_moves(self, pos):
@@ -486,11 +484,11 @@ class State():
         flip = player == Players.BLACK
         if piece == Pieces.K and idx_pos == self.index("e1", flip=flip):
             if idx_dest == self.index("g1", flip=flip):
-                # Temporary
+                # TODO: Temporary
                 return "O-O"
                 #move_string = "O-O"
             elif idx_dest == self.index("g1", flip=flip):
-                # Temporary
+                # TODO: Temporary
                 return "O-O-O"
                 #move_string = "O-O"
         
@@ -517,16 +515,17 @@ class State():
                 legal, _ = self.is_legal_move(piece_position, dest)
                 if legal:
                     if rank_hint == "" and piece_position[1] == pos[1]:
-                        rank_hint = str(pos[1] + 1)
+                        rank_hint = str(pos[0] + 1)
                     elif file_hint == "" and piece_position[0] == pos[0]:
-                        file_hint = self.rev_file_map[pos[0]]
+                        file_hint = self.rev_file_map[pos[1]]
+                    else:
+                        rank_hint = str(pos[0] + 1)
     
         move_string = move_string + piece.name + file_hint + rank_hint
         if dest_is_empty:
             move_string = move_string + self.rev_file_map[dest[1]] + str(dest[0]+1)
         elif dest_is_capturable_piece:
             move_string = move_string + "x" + self.rev_file_map[dest[1]] + str(dest[0]+1)
-
         return move_string
     
     def find_pieces_of_same_type(self, piece, player, pos):
@@ -785,8 +784,6 @@ class State():
             1D array describing the state of the board
         param player: 
             white or black
-        param hint: 
-            a number of letter denoting what rank or file the bishop is on
         return: 
             an int which is the index in a 1D array corresponding to the bishop's
             origin position
