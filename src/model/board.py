@@ -49,117 +49,6 @@ class Board():
             self.current_player = Player.WHITE if board_str[-1] == "0" else Player.BLACK
             self.pieces = self.__init_pieces_from_board_str(board_str)
     
-    def __str__(self) -> str:
-        output = ""
-        for rank in self.pieces:
-            for piece in rank:
-                if piece is not None:
-                    piece_str = str(piece)
-                    output = output + piece_str
-                else:
-                    output = output + "_"
-
-        # These three bits determine if Ra, K, Rh have moved for white
-        a1 = self.get("a1")
-        a1_moved = "0"
-        if not isinstance(a1, Rook) or a1.has_moved:
-            a1_moved = "1"
-
-        e1 = self.get("e1")
-        e1_moved = "0"
-        if not isinstance(e1, King) or e1.has_moved:
-            e1_moved = "1"
-
-        h1 = self.get("h1")
-        h1_moved = "0"
-        if not isinstance(h1, Rook) or h1.has_moved:
-            h1_moved = "1"
-        
-        # These three bits determine if Ra, K, Rh have moved for black
-        a8 = self.get("a8")
-        a8_moved = "0"
-        if not isinstance(a8, Rook) or a8.has_moved:
-            a8_moved = "1"
-
-        e8 = self.get("e8")
-        e8_moved = "0"
-        if not isinstance(e8, King) or e8.has_moved:
-            e8_moved = "1"
-
-        h8 = self.get("h8")
-        h8_moved = "0"
-        if not isinstance(h8, Rook) or h8.has_moved:
-            h8_moved = "1"
-
-        # Are the white and black kings in check? 
-        white_king: King = self.get(self.get_king_pos(Player.WHITE))
-        white_king_in_check = "1" if white_king.in_check else "0"
-
-        black_king: King = self.get(self.get_king_pos(Player.BLACK))
-        black_king_in_check = "1" if black_king.in_check else "0"
-
-        # Bit to determine which player's turn it is
-        current_player = "0" if self.current_player is Player.WHITE else "1"  
-
-        output = output + a1_moved + e1_moved + h1_moved + a8_moved + e8_moved + h8_moved + \
-            white_king_in_check + black_king_in_check + current_player
-
-        return output  
-
-    def __init_pieces_from_board_str(self, board_str: str):
-        pieces: List[List[Piece]] = []
-
-        in_check : Dict[Player : bool] = {}
-        in_check[Player.WHITE] = board_str[70] == "1"
-        in_check[Player.BLACK] = board_str[71] == "1"
-
-        for rank in range(8):
-            pieces_in_rank: List[Piece] = []
-            for file in range(8):
-                idx = 8 * rank + file
-                piece_type = board_str[idx] 
-
-                if piece_type == "_":
-                    pieces_in_rank.append(None)
-                    continue
-
-                pos = Pos(rank, file)
-                player = Player.WHITE if piece_type.isupper() else Player.BLACK
-
-                if piece_type == "K":
-                    has_moved = board_str[65] == "1"
-                elif piece_type == "k":
-                    has_moved = board_str[68] == "1"
-                elif piece_type == "R":
-                    a1_rook_moved = board_str[64] == "1"
-                    h1_rook_moved = board_str[66] == "1"
-                    if a1_rook_moved and h1_rook_moved:
-                        has_moved = True
-                    elif a1_rook_moved and pos != Pos.index("h1"):
-                        has_moved = True
-                    elif h1_rook_moved and pos != Pos.index("a1"):
-                        has_moved = True
-                    else:
-                        has_moved = False
-                elif piece_type == "r":
-                    a8_rook_moved = board_str[67] == "1"
-                    h8_rook_moved = board_str[69] == "1"
-                    if a8_rook_moved and h8_rook_moved:
-                        has_moved = True
-                    elif a8_rook_moved and pos != Pos.index("h8"):
-                        has_moved = True
-                    elif h8_rook_moved and pos != Pos.index("a8"):
-                        has_moved = True
-                    else:
-                        has_moved = False
-                else:
-                    has_moved = None
-
-                piece = self.__convert_piece_str_to_type(piece_type.upper(), pos, player, in_check=in_check[player], has_moved=has_moved)
-                pieces_in_rank.append(piece)
-            pieces.append(pieces_in_rank)
-
-        return pieces
 
     def get(self, tile: Union[Pos, str], player=None) -> Piece:
         """
@@ -411,6 +300,13 @@ class Board():
                 if isinstance(piece, piece_type) and piece.player == self.current_player:
                     pieces.append(piece)
         return pieces
+
+    def move_requires_promotion(self, pos: Pos, dest: Pos) -> bool:
+        """
+        TODO: method description
+        """
+        promotion_rank = 7 if self.current_player == Player.WHITE else 0
+        return isinstance(self.get(pos), Pawn) and dest.rank == promotion_rank
 
     def get_move_origin(self, move) -> Pos:
         """
@@ -857,7 +753,118 @@ class Board():
                     break
 
         return False
+    
+    def __str__(self) -> str:
+        output = ""
+        for rank in self.pieces:
+            for piece in rank:
+                if piece is not None:
+                    piece_str = str(piece)
+                    output = output + piece_str
+                else:
+                    output = output + "_"
+
+        # These three bits determine if Ra, K, Rh have moved for white
+        a1 = self.get("a1")
+        a1_moved = "0"
+        if not isinstance(a1, Rook) or a1.has_moved:
+            a1_moved = "1"
+
+        e1 = self.get("e1")
+        e1_moved = "0"
+        if not isinstance(e1, King) or e1.has_moved:
+            e1_moved = "1"
+
+        h1 = self.get("h1")
+        h1_moved = "0"
+        if not isinstance(h1, Rook) or h1.has_moved:
+            h1_moved = "1"
         
+        # These three bits determine if Ra, K, Rh have moved for black
+        a8 = self.get("a8")
+        a8_moved = "0"
+        if not isinstance(a8, Rook) or a8.has_moved:
+            a8_moved = "1"
+
+        e8 = self.get("e8")
+        e8_moved = "0"
+        if not isinstance(e8, King) or e8.has_moved:
+            e8_moved = "1"
+
+        h8 = self.get("h8")
+        h8_moved = "0"
+        if not isinstance(h8, Rook) or h8.has_moved:
+            h8_moved = "1"
+
+        # Are the white and black kings in check? 
+        white_king: King = self.get(self.get_king_pos(Player.WHITE))
+        white_king_in_check = "1" if white_king.in_check else "0"
+
+        black_king: King = self.get(self.get_king_pos(Player.BLACK))
+        black_king_in_check = "1" if black_king.in_check else "0"
+
+        # Bit to determine which player's turn it is
+        current_player = "0" if self.current_player is Player.WHITE else "1"  
+
+        output = output + a1_moved + e1_moved + h1_moved + a8_moved + e8_moved + h8_moved + \
+            white_king_in_check + black_king_in_check + current_player
+
+        return output  
+
+    def __init_pieces_from_board_str(self, board_str: str):
+        pieces: List[List[Piece]] = []
+
+        in_check : Dict[Player : bool] = {}
+        in_check[Player.WHITE] = board_str[70] == "1"
+        in_check[Player.BLACK] = board_str[71] == "1"
+
+        for rank in range(8):
+            pieces_in_rank: List[Piece] = []
+            for file in range(8):
+                idx = 8 * rank + file
+                piece_type = board_str[idx] 
+
+                if piece_type == "_":
+                    pieces_in_rank.append(None)
+                    continue
+
+                pos = Pos(rank, file)
+                player = Player.WHITE if piece_type.isupper() else Player.BLACK
+
+                if piece_type == "K":
+                    has_moved = board_str[65] == "1"
+                elif piece_type == "k":
+                    has_moved = board_str[68] == "1"
+                elif piece_type == "R":
+                    a1_rook_moved = board_str[64] == "1"
+                    h1_rook_moved = board_str[66] == "1"
+                    if a1_rook_moved and h1_rook_moved:
+                        has_moved = True
+                    elif a1_rook_moved and pos != Pos.index("h1"):
+                        has_moved = True
+                    elif h1_rook_moved and pos != Pos.index("a1"):
+                        has_moved = True
+                    else:
+                        has_moved = False
+                elif piece_type == "r":
+                    a8_rook_moved = board_str[67] == "1"
+                    h8_rook_moved = board_str[69] == "1"
+                    if a8_rook_moved and h8_rook_moved:
+                        has_moved = True
+                    elif a8_rook_moved and pos != Pos.index("h8"):
+                        has_moved = True
+                    elif h8_rook_moved and pos != Pos.index("a8"):
+                        has_moved = True
+                    else:
+                        has_moved = False
+                else:
+                    has_moved = None
+
+                piece = self.__convert_piece_str_to_type(piece_type.upper(), pos, player, in_check=in_check[player], has_moved=has_moved)
+                pieces_in_rank.append(piece)
+            pieces.append(pieces_in_rank)
+
+        return pieces
 
     def __copy__(self):
         cls = self.__class__

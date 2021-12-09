@@ -4,14 +4,14 @@ from .model.board import *
 from .model.player import Player
 from collections import defaultdict
 
-class Node():
+class StateNode():
     def __init__(self, move: str, state: str, depth: int = None):
         self.move = move
         self.state = state
         self.depth = depth
 
     def __eq__(self, __o: object) -> bool:
-        return isinstance(__o, Node)and self.move == __o.move and self.state == __o.state
+        return isinstance(__o, StateNode)and self.move == __o.move and self.state == __o.state
 
     def __ne__(self, __o: object) -> bool:
         return not (self == __o)
@@ -46,7 +46,7 @@ class StatePair():
             self.black_moved = self.white_moved.update(move)
             return self.white_moved, self.black_moved   
 
-def state_map_from_pgn(filepath, state_map: Dict[str, Set[Node]] = None):
+def state_map_from_pgn(filepath, state_map: Dict[str, Set[StateNode]] = None):
     if state_map is None:
         state_map = defaultdict(set)
 
@@ -96,20 +96,20 @@ def state_map_from_pgn(filepath, state_map: Dict[str, Set[Node]] = None):
                 
                 # Check for draws
                 # If a repetition is found, do not add this edge
-                state_map[str(key)].add(Node(first_move, str(val)))
+                state_map[str(key)].add(StateNode(first_move, str(val)))
             else:
                 # It is white's turn to move
                 key, val = variation_states[-1].make_move(Player.WHITE, first_move)
-                state_map[str(key)].add(Node(first_move, str(val)))
+                state_map[str(key)].add(StateNode(first_move, str(val)))
 
                 if second_move is None: 
                     continue
 
                 key, val = variation_states[-1].make_move(Player.BLACK, second_move)
-                state_map[str(key)].add(Node(second_move, str(val)))
+                state_map[str(key)].add(StateNode(second_move, str(val)))
 
     # Third element of each tuple in the continuations should be the greatest depth in that variation.
-    states_to_compute: List[Node] = list(state_map[str(Board())])
+    states_to_compute: List[StateNode] = list(state_map[str(Board())])
     finished_states = 0
     
     while states_to_compute:
@@ -131,7 +131,7 @@ def state_map_from_pgn(filepath, state_map: Dict[str, Set[Node]] = None):
         depths = []
         found_none = False
         for node in possible_continuations:
-            node: Node = node
+            node: StateNode = node
             if node.depth is None:
                 if node in states_to_compute:
                     node.depth = 1

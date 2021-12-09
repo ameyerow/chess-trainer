@@ -1,4 +1,7 @@
+from enum import Enum
 import pygame
+
+from src.model.player import Player
 
 pygame.init()
 
@@ -15,11 +18,18 @@ from .view.utils.screen_pos import ScreenPos
 from .view.utils.colors import Colors
 from .model.pos import Pos
 from .model.board import Board
-from .preprocess import Node
+from .preprocess import StateNode
+
+
+class InputState(Enum):
+    PLAYER=0
+    PROMOTION=1
+    AI = 2
+
 
 SCREEN_SIZE = (800, 800)
 
-def display_board(state_map: Dict[str, Set[Node]]):
+def display_board(state_map: Dict[str, Set[StateNode]]):
     image_directory = os.path.join(os.getcwd(), "sprites")
 
     game_display = pygame.display.set_mode(SCREEN_SIZE)
@@ -37,8 +47,11 @@ def display_board(state_map: Dict[str, Set[Node]]):
     legal_captures: List[Pos] = []
     positive_hints: Set[Pos] = set()
     negative_hints: Set[Pos] = set()
+    possible_promotion_pos: Pos = None
+    possible_promotion_player: Player = None
 
     ai_turn = False
+    training_mode = False
 
     while True:
         if ai_turn:
@@ -47,7 +60,7 @@ def display_board(state_map: Dict[str, Set[Node]]):
             if not possible_continuations:
                 break
             weights = list(map(lambda x: x.depth, possible_continuations))
-            node: Node = random.choices(possible_continuations, weights=weights, k=1)[0]
+            node: StateNode = random.choices(possible_continuations, weights=weights, k=1)[0]
             print(node.move, weights[possible_continuations.index(node)] / sum(weights))
 
             new_board_model = Board(board_str=node.state)
@@ -91,6 +104,11 @@ def display_board(state_map: Dict[str, Set[Node]]):
 
                                 move_type = board_view.board_model.is_legal_move(dest, moving_piece_view.piece_model)
                                 if move_type.is_legal():
+                                    if board_view.board_model.move_requires_promotion(origin, dest):
+                                        possible_promotion_player = moving_piece_view.piece_model.player
+                                        possible_promotion_pos = dest
+                                        break
+
                                     hint_str = "Possible continuations: "
                                     for node in possible_continuations:
                                         hint_str = hint_str + node.move + " "
@@ -99,7 +117,7 @@ def display_board(state_map: Dict[str, Set[Node]]):
                                     move_pgn = board_view.board_model.move_to_pgn_notation(origin, dest)
                                     new_board_model = board_view.board_model.update(move_pgn)
                                     
-                                    if Node(move_pgn, str(new_board_model)) not in possible_continuations:
+                                    if training_mode and StateNode(move_pgn, str(new_board_model)) not in possible_continuations:
                                         move_origin = board_view.board_model.get_move_origin(move_pgn)
                                         correct_piece = False
                                         for node in possible_continuations:
@@ -134,6 +152,7 @@ def display_board(state_map: Dict[str, Set[Node]]):
                 board_view.tiles.update((-1,-1), legal_moves, legal_captures, positive_hints, negative_hints, last_move)   
 
             board_view.pieces.update(ScreenPos(mouse_pos[0], mouse_pos[1]), positive_hints, negative_hints)
+            board_view.promotion_views.update(possible_promotion_pos, possible_promotion_player)
 
         game_display.fill(Colors.WHITE.value)
         board_view.draw(game_display)
