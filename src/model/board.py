@@ -308,6 +308,47 @@ class Board():
         promotion_rank = 7 if self.current_player == Player.WHITE else 0
         return isinstance(self.get(pos), Pawn) and dest.rank == promotion_rank
 
+    def get_move_destination(self, move) -> Pos:
+        """
+        Return the destination position of the given move.
+
+        param move: 
+            The move string, i.e. "Qd4".
+
+        return: 
+            The destination position.
+        """
+        player = self.current_player
+
+        pattern = "(?:(?:([PNBRQK](?:[a-h]|[1-8])?)?([a-h][1-8])|O(?:-?O){1,2}|([PNBRQK](?:[a-h]|"\
+                  "[1-8])?|[a-h])(x)([a-h][1-8]))(?:=([NBRQ]))?[\+#]?)"
+        match = re.match(pattern, move)
+
+        is_long_castle = match.group(0).startswith("O-O-O")
+        is_short_castle = match.group(0).startswith("O-O")
+        # Note: this if statement uses .startswith instead of == because this move can also come
+        # with check or result in checkmate
+
+        move_destination = Pos.index(match.group(2)) if match.group(2) is not None else None
+
+        is_capture = match.group(4) is not None and match.group(4) == "x"
+        capture_destination = Pos.index(match.group(5)) if match.group(5) is not None else None
+        
+        if is_long_castle:
+            # Long castles
+            castle_destination = Pos.index("c1", player = player)
+            return castle_destination
+        elif is_short_castle:
+            # Short castles
+            castle_destination = Pos.index("g1", player = player)
+            return castle_destination
+        elif is_capture:
+            # Capturing a piece
+            return capture_destination
+        else:
+            # The move string represents moving a piece, no captures
+            return move_destination
+
     def get_move_origin(self, move) -> Pos:
         """
         Return the origin position of the given move.

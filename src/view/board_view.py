@@ -35,16 +35,13 @@ class BoardView():
         #self.board_model_history = []
 
         self.moving_piece_view: PieceView = None
-        
         self.last_move: Tuple[Pos, Pos] = (None, None)
-
         self.legal_moves_to_display: List[Pos] = []
         self.legal_captures_to_display: List[Pos] = []
-
         self.positive_hints_to_display: Set[Pos] = set()
         self.negative_hints_to_display: Set[Pos] = set()
-
-        self.possible_promotion_pos: Pos = None
+        self.possible_promotion_dest: Pos = None
+        self.possible_promotion_origin: Pos = None
         self.possible_promotion_player: Player = None
 
         self.sprites = pygame.sprite.Group()
@@ -106,6 +103,30 @@ class BoardView():
         self.legal_moves_to_display = []
         self.positive_hints_to_display = set()
         self.negative_hints_to_display = set()
+        self.possible_promotion_player = None
+        self.possible_promotion_dest = None
+        self.possible_promotion_origin = None
+
+    def updateChildren(self, mouse_pos: Tuple[float, float], mouse_button_held_down: bool):
+        if self.moving_piece_view is not None and mouse_button_held_down:
+            mouse_screen_pos = ScreenPos(mouse_pos[0], mouse_pos[1])
+        else:
+            mouse_screen_pos = ScreenPos(-1, -1) 
+
+        self.tiles.update(
+            mouse_screen_pos, 
+            self.legal_moves_to_display, 
+            self.legal_captures_to_display, 
+            self.positive_hints_to_display, 
+            self.negative_hints_to_display, 
+            self.last_move)
+        self.pieces.update(
+            mouse_screen_pos, 
+            self.positive_hints_to_display, 
+            self.negative_hints_to_display)
+        self.promotion_views.update(
+            self.possible_promotion_dest, 
+            self.possible_promotion_player)
     
     def draw(self, screen):
         board = pygame.Surface((self.size, self.size))
