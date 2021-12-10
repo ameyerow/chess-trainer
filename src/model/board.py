@@ -49,7 +49,6 @@ class Board():
             self.current_player = Player.WHITE if board_str[-1] == "0" else Player.BLACK
             self.pieces = self.__init_pieces_from_board_str(board_str)
     
-
     def get(self, tile: Union[Pos, str], player=None) -> Piece:
         """
         Get the piece at the given position
@@ -226,12 +225,11 @@ class Board():
                     return True
 
         if from_piece.can_pin_diagonally():
-            min_rank = min(from_pos.rank, to_pos.rank)
-            max_rank = max(from_pos.rank, to_pos.rank)
-            min_file = min(from_pos.file, to_pos.file)
-            max_file = max(from_pos.file, to_pos.file)
+            delta_rank = 1 if rank_diff < 0 else -1
+            delta_file = 1 if file_diff < 0 else -1
 
-            for rank, file in zip(range(min_rank+1, max_rank), range(min_file+1, max_file)):
+            for rank, file in zip(range(from_pos.rank+delta_rank, to_pos.rank, delta_rank),\
+                                  range(from_pos.file+delta_file, to_pos.file, delta_file)):
                 curr_pos = Pos(rank, file)
                 if curr_pos == dest:
                     return True
@@ -419,7 +417,7 @@ class Board():
         return: 
             The updated board.
         """
-        print(move)
+        #print(move)
         updated_board: Board = copy(self)
         player = updated_board.current_player
 

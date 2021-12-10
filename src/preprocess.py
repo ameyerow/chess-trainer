@@ -113,7 +113,6 @@ def state_map_from_pgn(filepath, state_map: Dict[str, Set[StateNode]] = None):
     finished_states = 0
     
     while states_to_compute:
-        print(len(states_to_compute), finished_states)
         curr_node = states_to_compute[-1]
 
         if curr_node.depth is not None:

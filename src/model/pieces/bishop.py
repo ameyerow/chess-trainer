@@ -18,9 +18,6 @@ class Bishop(Piece):
         return True
 
     def attacks_square_from_position(self, pos: Pos, dest: Pos, board) -> bool:
-        if pos == dest:
-            return False
-
         # A slope of 1 or -1 must exists between the piece position and the position being attacked.
         rank_diff = dest.rank - pos.rank
         file_diff = dest.file - pos.file
@@ -30,19 +27,18 @@ class Bishop(Piece):
 
         # Iterate along the diagonal and check if each square in between the piece's position and the
         # destination is empty. If we encouter the current location of this piece we consider it empty!
-        min_rank = min(pos.rank, dest.rank)
-        max_rank = max(pos.rank, dest.rank)
-        min_file = min(pos.file, dest.file)
-        max_file = max(pos.file, dest.file)
+        delta_rank = 1 if rank_diff < 0 else -1
+        delta_file = 1 if file_diff < 0 else -1
 
-        for rank, file in zip(range(min_rank+1, max_rank), range(min_file+1, max_file)):
+        for rank, file in zip(range(dest.rank+delta_rank, pos.rank, delta_rank),\
+                              range(dest.file+delta_file, pos.file, delta_file)):
             curr_pos = Pos(rank, file)
             if curr_pos == self.pos or board.get(curr_pos) is None:
                 continue
             else:
                 return False
 
-        return True
+        return True    
     
     @staticmethod
     def get_origin(destination_pos: Pos, board, origin_hint: str = None) -> Pos:

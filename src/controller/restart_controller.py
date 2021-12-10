@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 from typing import List, Set, Dict
 

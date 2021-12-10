@@ -19,6 +19,8 @@ SCREEN_SIZE = (800, 800)
 COMPUTER_RESPONSE_ENABLED = True
 TRAINING_ENABLED = True
 
+# TODO: Add accuracy tracker!!
+
 def main():
     pgn_path = os.path.join(os.getcwd(), "pgns/d4Dynamite.pgn")
     state_map = state_map_from_pgn(pgn_path)
