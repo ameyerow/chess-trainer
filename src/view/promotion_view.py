@@ -46,8 +46,8 @@ class PromotionView(pygame.sprite.Sprite):
 
         self.background = pygame.Surface((sprite_size, 5*sprite_size))
         self.background.fill(Colors.WHITE.value)
-        pygame.draw.rect(self.background, Colors.BLACK.value, [0, 0, sprite_size, 5*sprite_size], sprite_size//20)
-        self.background.set_alpha(255)
+        pygame.draw.rect(self.background, Colors.BLACK.value, [0, 0, sprite_size, 5*sprite_size], 1)
+        self.background.set_alpha(0)
 
         self.background_rect = self.background.get_rect()
         self.background_rect.x = 0
