@@ -30,4 +30,9 @@ class ComputerController(Controller):
         new_board_model = Board(board_str=node.state)
         board_view.update(new_board_model, origin, dest)
 
-        return ControlType.Player
+        possible_continuations = self.state_map[str(new_board_model)]
+        if not possible_continuations:
+            board_view.prompt_for_restart = True
+            return ControlType.Restart
+        else:
+            return ControlType.Player

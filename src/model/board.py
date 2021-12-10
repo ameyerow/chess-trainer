@@ -129,7 +129,7 @@ class Board():
         raise PieceNotFoundException(self, message="Did not find {} king".format(
             "black" if player is Player.BLACK else "white"))
 
-    
+    # TODO: CRASHES IN ENGLUND GAMBIT LINE!!!
     def is_legal_move(self, dest: Pos, piece: Piece) -> Move:
         """
         Given a destination position, determine if this piece can legally move there given the

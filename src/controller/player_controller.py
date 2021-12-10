@@ -127,6 +127,12 @@ class PlayerController(Controller):
                             # model
                             board_view.update(new_board_model, origin, dest)
 
+                            # If there are no continuations from this line, prompt to restart the game
+                            possible_continuations = self.state_map[str(new_board_model)]
+                            if self.training_enabled and not possible_continuations:
+                                board_view.prompt_for_restart = True
+                                return ControlType.Restart
+
                             if self.computer_response_enabled:
                                 return ControlType.Computer
                             else:

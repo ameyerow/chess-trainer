@@ -8,6 +8,7 @@ from .utils.colors import Colors
 from .piece_view import PieceView
 from .piece_group import PieceGroup
 from .tile_effect_view import TileEffectView
+from .restart_view import RestartView
 from .tile_group import TileGroup
 from .promotion_view import PromotionView
 from .promotion_group import PromotionGroup
@@ -43,18 +44,20 @@ class BoardView():
         self.possible_promotion_dest: Pos = None
         self.possible_promotion_origin: Pos = None
         self.possible_promotion_player: Player = None
+        self.prompt_for_restart = False
 
         self.sprites = pygame.sprite.Group()
         self.tiles = TileGroup()
         self.pieces = PieceGroup()
         self.promotion_views = PromotionGroup()
+        self.restart_view = RestartView(self.size//8, self.board_offset)
 
         self.convert_model_to_view()
         self.init_tile_effect_views()
         self.init_promotion_views()
 
     def init_tile_effect_views(self):
-        tile_size = int(self.size / 8)
+        tile_size = self.size//8
         for rank in range(8):
             for file in range(8):
                 board_pos = Pos(rank, file)
@@ -71,7 +74,7 @@ class BoardView():
         promotion_view_black.add(self.promotion_views, self.sprites)
 
     def convert_model_to_view(self):
-        tile_size = int(self.size / 8)
+        tile_size = self.size//8
         for rank in range(8):
             for file in range(8):
                 pos = Pos(rank, file)
@@ -106,6 +109,7 @@ class BoardView():
         self.possible_promotion_player = None
         self.possible_promotion_dest = None
         self.possible_promotion_origin = None
+        self.prompt_for_restart = False
 
     def updateChildren(self, mouse_pos: Tuple[float, float], mouse_button_held_down: bool):
         if self.moving_piece_view is not None and mouse_button_held_down:
@@ -127,6 +131,8 @@ class BoardView():
         self.promotion_views.update(
             self.possible_promotion_dest, 
             self.possible_promotion_player)
+        self.restart_view.update(
+            self.prompt_for_restart)
     
     def draw(self, screen):
         board = pygame.Surface((self.size, self.size))
@@ -176,3 +182,4 @@ class BoardView():
 
         self.pieces.draw(screen)
         self.promotion_views.draw(screen)
+        self.restart_view.draw(screen)

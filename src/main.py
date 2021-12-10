@@ -10,13 +10,14 @@ from .controller.control_type import ControlType
 from .controller.player_controller import PlayerController
 from .controller.computer_controller import ComputerController
 from .controller.promotion_controller import PromotionController
+from .controller.restart_controller import RestartController
 from .view.utils.colors import Colors
 from .view.board_view import BoardView
 from .view.utils.screen_pos import ScreenPos
 
 SCREEN_SIZE = (800, 800)
-COMPUTER_RESPONSE_ENABLED = False
-TRAINING_ENABLED = False
+COMPUTER_RESPONSE_ENABLED = True
+TRAINING_ENABLED = True
 
 def main():
     pgn_path = os.path.join(os.getcwd(), "pgns/d4Dynamite.pgn")
@@ -36,7 +37,6 @@ def display_board(state_map: Dict[str, Set[StateNode]]):
     pygame.display.set_icon(icon)
 
     board_view = BoardView(image_directory, size=760, board_offset=ScreenPos(20, 20))
-    # past_states: List[Board] = [board_view.board_model]
 
     controllers: Dict[ControlType, Controller] = {}
     controllers[ControlType.Player] = PlayerController(
@@ -48,6 +48,7 @@ def display_board(state_map: Dict[str, Set[StateNode]]):
         computer_response_enabled=COMPUTER_RESPONSE_ENABLED,
         training_enabled=TRAINING_ENABLED)
     controllers[ControlType.Computer] = ComputerController(state_map)
+    controllers[ControlType.Restart] = RestartController()
 
     active_control_type = ControlType.Player
 
@@ -55,7 +56,6 @@ def display_board(state_map: Dict[str, Set[StateNode]]):
         controller: Controller = controllers[active_control_type]
         active_control_type = controller.handle_events(board_view)
  
-
         game_display.fill(Colors.WHITE.value)
         board_view.draw(game_display)
         pygame.display.update()
