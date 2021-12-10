@@ -40,7 +40,7 @@ class TileEffectView(pygame.sprite.Sprite):
         self.hint_background_rect.y = self.screen_pos.y
     
     def update(self, 
-            cursor_pos: Tuple[float, float], 
+            mouse_screen_pos: ScreenPos, 
             legal_moves: List[Pos], 
             legal_captures: List[Pos], 
             positive_hints: Set[Pos], 
@@ -72,6 +72,6 @@ class TileEffectView(pygame.sprite.Sprite):
             pygame.draw.circle(self.image, Colors.BLACK.value, \
                 (self.size//2, self.size//2), self.size//6, width=0)
 
-        if self.rect.collidepoint(cursor_pos):
+        if self.rect.collidepoint((mouse_screen_pos[0], mouse_screen_pos[1])):
             color = Colors.CREAM.value if self.board_pos[0] % 2 == self.board_pos[1] % 2 else Colors.BLUE.value
             pygame.draw.rect(self.image, color, [0, 0, self.size, self.size], self.size//10)
