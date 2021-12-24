@@ -118,7 +118,17 @@ class Piece(metaclass=abc.ABCMeta):
         if rank_diff == 0:
             delta = 1 if file_diff < 0 else -1
             edge = -1 if delta < 0 else 8
+
+            # Is there an empty path between us and the king?
+            for i in range(king_pos.file + delta, self.pos.file, delta):
+                pos = Pos(rank=self.pos.rank, file=i)
+                piece = board.get(pos)
+                
+                # If the piece is not empty, return True because there is no pin to maintain
+                if piece is not None:
+                    return True
       
+            # Is there a piece pinning us to the king?
             for i in range(self.pos.file + delta, edge, delta):
                 pos = Pos(rank=self.pos.rank, file=i)
                 piece = board.get(pos)
@@ -142,6 +152,13 @@ class Piece(metaclass=abc.ABCMeta):
         if file_diff == 0:
             delta = 1 if rank_diff < 0 else -1
             edge = -1 if delta < 0 else 8
+
+            for i in range(king_pos.rank + delta, self.pos.rank, delta):
+                pos = Pos(rank=i, file=self.pos.file)
+                piece = board.get(pos)
+
+                if piece is not None:
+                    return True
     
             for i in range(self.pos.rank + delta, edge, delta):
                 pos = Pos(rank=i, file=self.pos.file)
@@ -158,13 +175,26 @@ class Piece(metaclass=abc.ABCMeta):
         if rank_diff == 0 or file_diff == 0:
             return True
 
-        # TODO: didn't work on left diagonal toward black king
-        # TODO: test again after changes
         # If the piece is on the same diagonal as the King we must check if any pin along the diagonal
         # exists, and if it does exist it is maintained
         if abs(rank_diff/file_diff) == 1:
             delta_rank = 1 if rank_diff < 0 else -1
             delta_file = 1 if file_diff < 0 else -1
+
+            # As we search for a pinning piece keep track of the possible moves we could have made that 
+            # would maintain the pin 
+            possible_moves = []
+
+            # Is there an empty path between us and the king?
+            for rank, file in zip(range(king_pos.rank+delta_rank, self.pos.rank, delta_rank),\
+                        range(king_pos.file+delta_file, self.pos.file, delta_file)):
+                pos = Pos(rank, file)
+                possible_moves.append(pos)
+                piece = board.get(pos)
+
+                # If the piece is not empty, return True because there is no pin to maintain
+                if piece is not None:
+                    return True
 
             # How many tiles are between the current piece and the edge of the board along the piece-King
             # diagonal?
@@ -174,9 +204,6 @@ class Piece(metaclass=abc.ABCMeta):
             edge_rank = self.pos.rank + delta_rank * num_steps
             edge_file = self.pos.file + delta_file * num_steps
 
-            # As we search for a pinning piece keep track of the possible moves we could have made that 
-            # would maintain the pin 
-            possible_moves = []
             for i, j in zip(range(self.pos.rank + delta_rank, edge_rank, delta_rank), \
                             range(self.pos.file + delta_file, edge_file, delta_file)):
                 pos = Pos(rank=i, file=j)
@@ -184,7 +211,6 @@ class Piece(metaclass=abc.ABCMeta):
                 piece = board.get(pos)
                 if piece is not None:
                     if piece.can_pin_diagonally():
-                        # TODO: this may not account for tiles IN BETWEEN piece and the king
                         if dest not in possible_moves:
                             return False
                     break 

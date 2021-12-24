@@ -4,6 +4,7 @@ from .model.board import *
 from .model.player import Player
 from collections import defaultdict
 
+
 class StateNode():
     def __init__(self, move: str, state: str, depth: int = None):
         self.move = move

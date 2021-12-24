@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Move(Enum):
     CAPTURE = 0
     MOVE = 1
