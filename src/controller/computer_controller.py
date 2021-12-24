@@ -1,3 +1,4 @@
+import sys
 import pygame
 import random
 
@@ -28,7 +29,7 @@ class ComputerController(Controller):
         origin = board_view.board_model.get_move_origin(node.move)
         dest = board_view.board_model.get_move_destination(node.move)
         new_board_model = Board(board_str=node.state)
-        board_view.update(new_board_model, origin, dest)
+        board_view.update(new_board_model, origin, dest, comment=node.comment, move_str=node.move, append_detail=True)
 
         possible_continuations = self.state_map[str(new_board_model)]
         if not possible_continuations:

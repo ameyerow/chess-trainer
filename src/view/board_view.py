@@ -33,8 +33,7 @@ class BoardView():
         else: 
             self.board_model = board_model
 
-        #self.board_model_history = []
-
+        self.detail = "Welcome to Repertoire Trainer!"
         self.moving_piece_view: PieceView = None
         self.last_move: Tuple[Pos, Pos] = (None, None)
         self.legal_moves_to_display: List[Pos] = []
@@ -85,7 +84,7 @@ class BoardView():
                     piece = PieceView(self.image_directory, piece_model, resting_screen_pos, tile_size)
                     piece.add(self.pieces, self.sprites)
     
-    def update(self, board: Board, origin: Pos, dest: Pos):
+    def update(self, board: Board, origin: Pos, dest: Pos, comment: str = "", move_str: str = "", append_detail=False):
         """
         Updates the board view with a new model
 
@@ -101,6 +100,10 @@ class BoardView():
             piece.kill()
         self.convert_model_to_view()
 
+        if append_detail:
+            self.detail = self.detail + "\n" + (move_str + "\n" + comment.replace("{", "").replace("}", "").strip()).strip()
+        else:
+            self.detail = (move_str + "\n" + comment.replace("{", "").replace("}", "").strip()).strip()
         self.last_move = (origin, dest)
         self.legal_captures_to_display = []
         self.legal_moves_to_display = []

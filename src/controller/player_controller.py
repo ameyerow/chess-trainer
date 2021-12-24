@@ -104,7 +104,6 @@ class PlayerController(Controller):
                         # If, however, this isn't a proper continuation in our state map we adjust the displayed hints
                         # and have the player make another move.
                         possible_continuations = self.state_map[str(board_model)]
-                        print(move_pgn)
                         if self.training_enabled and StateNode(move_pgn, str(new_board_model)) not in possible_continuations:
                             move_origin = board_model.get_move_origin(move_pgn)
                             # At this point we know the move the player made was not a correct continuation but it may
@@ -126,14 +125,16 @@ class PlayerController(Controller):
                         else:
                             # In the case that the move was a proper continuation we update the board view with the new
                             # model
-                            board_view.update(new_board_model, origin, dest)
+                            comment = ""
+                            for continuation in possible_continuations:
+                                if StateNode(move_pgn, str(new_board_model)) == continuation:
+                                    comment = continuation.comment
+
+                            board_view.update(new_board_model, origin, dest, comment=comment, move_str=move_pgn)
 
                             # If there are no continuations from this line, prompt to restart the game
                             possible_continuations = self.state_map[str(new_board_model)]
-                            # hint_str = "Possible continuations: "
-                            # for node in possible_continuations:
-                            #     hint_str = hint_str + node.move + " "
-                            # print(hint_str)
+
                             if self.training_enabled and not possible_continuations:
                                 board_view.prompt_for_restart = True
                                 return ControlType.Restart
