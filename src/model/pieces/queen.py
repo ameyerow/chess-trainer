@@ -86,6 +86,8 @@ class Queen(Piece):
         rank = destination_pos.rank
         file = destination_pos.file
 
+        possible_origin_pieces: List[Queen] = []
+
         max_straight = max([rank, file, 7 - rank, 7 - file])
         for offset in range(1, max_straight + 1):
             for o in [offset, -offset]:
@@ -93,12 +95,12 @@ class Queen(Piece):
                     pos = Pos(rank + o, file)
                     queen = board.get(pos)
                     if isinstance(queen, Queen) and queen.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(queen)
                 if 0 <= file + o < 8:
                     pos = Pos(rank, file + o)
                     queen = board.get(pos)
                     if isinstance(queen, Queen) and queen.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(queen)
 
         max_diag = max([rank, file, 7-rank, 7-file])
         for offset in range(1, max_diag+1):
@@ -107,7 +109,11 @@ class Queen(Piece):
                     pos = Pos(rank + i, file + j)
                     queen = board.get(pos)
                     if isinstance(queen, Queen) and queen.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(queen)
+        
+        for piece in possible_origin_pieces:
+            if piece.is_dest_reachable(destination_pos, board):
+                return piece.pos
 
         raise PieceNotFoundException("Didn't find Queen's origin")
 

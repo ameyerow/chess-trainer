@@ -50,6 +50,7 @@ class Bishop(Piece):
         rank = destination_pos.rank
         file = destination_pos.file
 
+        possible_origin_pieces: List[Bishop] = []
         max_diag = max([rank, file, 7 - rank, 7 - file])
         for offset in range(1, max_diag+1):
             for i, j in itertools.product([offset, -offset], repeat=2):
@@ -57,7 +58,12 @@ class Bishop(Piece):
                     pos = Pos(rank + i, file + j)
                     bishop = board.get(pos)
                     if isinstance(bishop, Bishop) and bishop.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(bishop)
+
+        for piece in possible_origin_pieces:
+            if piece.is_dest_reachable(destination_pos, board):
+                return piece.pos
+
         raise PieceNotFoundException("Didn't find Bishop's origin")
 
     def is_dest_reachable(self, dest: Pos, board) -> bool:
