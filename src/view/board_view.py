@@ -101,7 +101,7 @@ class BoardView():
         self.convert_model_to_view()
 
         if append_detail:
-            self.detail = self.detail + "\n" + (move_str + "\n" + comment.replace("{", "").replace("}", "").strip()).strip()
+            self.detail = self.detail + "\n---------------\n" + (move_str + "\n" + comment.replace("{", "").replace("}", "").strip()).strip()
         else:
             self.detail = (move_str + "\n" + comment.replace("{", "").replace("}", "").strip()).strip()
         self.last_move = (origin, dest)
