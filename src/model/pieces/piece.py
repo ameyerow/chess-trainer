@@ -210,9 +210,10 @@ class Piece(metaclass=abc.ABCMeta):
                 possible_moves.append(pos)
                 piece = board.get(pos)
                 if piece is not None:
-                    if piece.can_pin_diagonally():
-                        if dest not in possible_moves:
-                            return False
+                    if piece.player is not board.current_player:
+                        if piece.can_pin_diagonally():
+                            if dest not in possible_moves:
+                                return False
                     break 
         
         return True

@@ -417,7 +417,6 @@ class Board():
         return: 
             The updated board.
         """
-        #print(move)
         updated_board: Board = copy(self)
         player = updated_board.current_player
 

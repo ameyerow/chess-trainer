@@ -58,7 +58,8 @@ class Rook(Piece):
 
         rank = destination_pos.rank
         file = destination_pos.file
-        
+
+        possible_origin_pieces: List[Rook] = []
         max_straight = max([rank, file, 7 - rank, 7 - file])
         for offset in range(1, max_straight + 1):
             for o in [offset, -offset]:
@@ -66,12 +67,17 @@ class Rook(Piece):
                     pos = Pos(rank + o, file)
                     rook = board.get(pos)
                     if isinstance(rook, Rook) and rook.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(rook)
                 if 0 <= file + o < 8:
                     pos = Pos(rank, file + o)
                     rook = board.get(pos)
                     if isinstance(rook, Rook) and rook.player == board.current_player:
-                        return pos
+                        possible_origin_pieces.append(rook)
+        
+        for piece in possible_origin_pieces:
+            if piece.is_dest_reachable(destination_pos, board):
+                return piece.pos
+
         raise PieceNotFoundException("Didn't find Rook's origin")
     
     def is_dest_reachable(self, dest: Pos, board) -> bool:

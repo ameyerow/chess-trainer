@@ -14,8 +14,12 @@ from .controller.restart_controller import RestartController
 from .view.utils.colors import Colors
 from .view.board_view import BoardView
 from .view.utils.screen_pos import ScreenPos
+from .view.utils.text import multiLineSurface
 
-SCREEN_SIZE = (800, 800)
+TILE_SIZE = 100
+BORDER = 20
+DETAIL_PANEL_WIDTH = 300
+SCREEN_SIZE = (TILE_SIZE*8 + 3*BORDER + DETAIL_PANEL_WIDTH, TILE_SIZE*8 + 2*BORDER)
 COMPUTER_RESPONSE_ENABLED = True
 TRAINING_ENABLED = True
 
@@ -24,8 +28,6 @@ TRAINING_ENABLED = True
 def main():
     pgn_path = os.path.join(os.getcwd(), "pgns/d4Dynamite.pgn")
     state_map = state_map_from_pgn(pgn_path)
-
-    print()
 
     display_board(state_map)
 
@@ -38,7 +40,7 @@ def display_board(state_map: Dict[str, Set[StateNode]]):
     icon = pygame.image.load(os.path.join(image_directory, "BLACK_Q.png"))
     pygame.display.set_icon(icon)
 
-    board_view = BoardView(image_directory, size=760, board_offset=ScreenPos(20, 20))
+    board_view = BoardView(image_directory, size=TILE_SIZE*8, board_offset=ScreenPos(BORDER, BORDER))
 
     controllers: Dict[ControlType, Controller] = {}
     controllers[ControlType.Player] = PlayerController(
@@ -60,6 +62,13 @@ def display_board(state_map: Dict[str, Set[StateNode]]):
  
         game_display.fill(Colors.WHITE.value)
         board_view.draw(game_display)
+
+        # TODO: Move this somewhere permanent
+        font_size = TILE_SIZE // 5
+        font = pygame.font.SysFont('Arial', font_size)
+        text_surface = multiLineSurface(board_view.detail, font, pygame.Rect(0, 0, DETAIL_PANEL_WIDTH, TILE_SIZE*8), Colors.BLACK.value, Colors.WHITE.value)
+        game_display.blit(text_surface, (840, 20))
+
         pygame.display.update()
 
 if __name__ == "__main__":
