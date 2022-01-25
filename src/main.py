@@ -26,7 +26,7 @@ TRAINING_ENABLED = True
 # TODO: Add accuracy tracker!!
 
 def main():
-    pgn_path = os.path.join(os.getcwd(), "pgns/d4Dynamite.pgn")
+    pgn_path = os.path.join(os.getcwd(), "pgns/FrenchDefense.pgn")
     state_map = state_map_from_pgn(pgn_path)
 
     display_board(state_map)
