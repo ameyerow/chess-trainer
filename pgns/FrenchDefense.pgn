@@ -1,0 +1,37 @@
+[Event "?"]
+[Site "?"]
+[Date "????.??.??"]
+[Round "?"]
+[White "?"]
+[Black "?"]
+[Result "*"]
+
+1. e4 e6 2. d4 (2. Nf3 {Common reply when people are unfamiliar to this setup}
+2... d5 3. exd5 exd5 4. d4 {Transposed into the exchange variation} 4... Bd6 5.
+Bd3 Ne7 {Introducing a bit a asymmetry into the position and giving us the
+option to play Bf5 in the future.} (5... Bg4 {A more ambitious setup aiming at
+an eventual queen side castling} 6. O-O Nc6 7. c3 Nge7 {[%csl dd8,dg6][%c_square
+d8;square;d8,g6;square;g6][%cal dd8d7,de7g6][%c_arrow
+d8d7;from;d8;to;d7,e7g6;from;e7;to;g6] From here black plans to play Qd7 castle
+queen side and play Ng6}) 6. O-O O-O 7. Re1) 2... d5 3. e5 {In the advance
+variation we immediately want to put pressure on the d4 pawn} (3. Nc3 dxe4 4.
+Nxe4 {We want to move the knight out to the d7 square after this trade to
+support the f6 and c5 squares} 4... Nd7 5. Nf3 Ngf6 {The idea is always to play
+c5 here} 6. Nxf6+ (6. Bd3 c5 7. O-O {When your opponent has castled and you are
+still not able to, take in the middle!} 7... cxd4 8. Nxd4 {Focus on getting the
+king to safety} 8... Be7 9. Nxf6+ Nxf6 10. Re1 {THIS IS NOT A FREE KNIGHT} 10...
+Qxd4 (10... O-O 11. b3 Qxd4 12. Bxh7+) 11. Bb5+) (6. Ng3 c5) 6... Nxf6 7. Bc4
+({This is best response but is unlikely to be seen} 7. Be3 Be7 8. Be2 O-O 9. O-O
+{Only AFTER castling do we want to try and fianchetto our light-squared bishop}
+9... b6 10. Re1 {This bishop goes from being your worst piece to being the best
+piece on the board} 10... Bb7 11. h3 Rc8 {The idea is to continue trying to push
+c5} 12. c3 c5 13. Rc1 Qc7 14. Bd3 Rfd8 {This is the IDEAL setup we're looking
+for}) 7... c5 {[%cal dd4c5][%c_arrow d4c5;from;d4;to;c5]}) 3... c5 4. c3 {The
+queen is our first piece out putting pressure on b2} 4... Qb6 5. Nf3 Nc6 6. Bd3
+(6. Be2 {We are putting our knight on the rim to add another attacking piece to
+the center. We ONLY want to take d4 when we're ready to start an attack!} 6...
+Nh6 7. O-O (7. Bxh6 Qxb2 8. Bd2 Qxa1) 7... cxd4 8. cxd4 Nf5) ({A common blunder
+I've seen} 6. Be3 Qxb2 7. Nbd2 Qxc3 8. Rc1 Qa3 9. dxc5 Nge7 10. Nb1 Qa5+ 11. Bd2
+Qc7 12. Nc3 {Critical that you play a6 to avoid the knight difficulties} 12...
+a6!! {[%csl db5][%c_square b5;square;b5]}) 6... Bd7 7. O-O cxd4 8. cxd4 Nxd4 9.
+Nxd4 Qxd4 *
